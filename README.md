@@ -23,6 +23,7 @@ O **RotaFácil** é uma aplicação web criada para profissionais que trabalham 
 ### 🎯 Problema que resolve
 
 Quando você precisa visitar vários clientes no dia, definir manualmente a ordem das visitas pode resultar em rotas ineficientes e desperdício de tempo e combustível. 
+
 O RotaFácil otimiza essa rota automaticamente, economizando tempo e recursos.
 
 ---
