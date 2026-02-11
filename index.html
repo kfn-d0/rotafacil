@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Otimizador de Rotas - Calcule a melhor rota para atendimento aos seus clientes">
+    <title>RotaFácil - Otimizador de Rotas</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- App CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i data-lucide="route" class="logo-svg"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>RotaFácil</h1>
+                        <span class="logo-subtitle">Otimizador de Rotas</span>
+                    </div>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="Recolher menu">
+                    <i data-lucide="panel-left-close"></i>
+                </button>
+            </div>
+
+            <!-- Base Location -->
+            <div class="section">
+                <div class="section-header">
+                    <i data-lucide="building-2"></i>
+                    <h2>Central (Base)</h2>
+                </div>
+                <div class="base-location-card">
+                    <div class="base-coords">
+                        <span class="coord-label">Lat:</span>
+                        <input type="text" id="baseLat" value="-2.5297" class="coord-input">
+                    </div>
+                    <div class="base-coords">
+                        <span class="coord-label">Lng:</span>
+                        <input type="text" id="baseLng" value="-44.2825" class="coord-input">
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="updateBaseBtn" title="Atualizar localização da base">
+                        <i data-lucide="map-pin"></i>
+                        <span>Atualizar Base</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add Client -->
+            <div class="section">
+                <div class="section-header">
+                    <i data-lucide="user-plus"></i>
+                    <h2>Adicionar Cliente</h2>
+                </div>
+                <div class="add-client-form">
+                    <div class="form-group">
+                        <label for="clientName">Nome do Cliente</label>
+                        <input type="text" id="clientName" placeholder="Ex: João Silva" class="input">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientLink">Link do Google Maps</label>
+                        <textarea id="clientLink" placeholder="Cole o link do Google Maps aqui..."
+                            class="input textarea" rows="3"></textarea>
+                    </div>
+                    <div class="form-group coords-manual" id="coordsManual" style="display:none;">
+                        <label>Ou insira as coordenadas manualmente</label>
+                        <div class="coords-row">
+                            <input type="text" id="clientLat" placeholder="Latitude" class="input">
+                            <input type="text" id="clientLng" placeholder="Longitude" class="input">
+                        </div>
+                    </div>
+                    <button class="btn-link" id="toggleManualCoords">
+                        <i data-lucide="settings-2"></i>
+                        <span>Inserir coordenadas manualmente</span>
+                    </button>
+                    <button class="btn btn-primary" id="addClientBtn">
+                        <i data-lucide="plus-circle"></i>
+                        <span>Adicionar Cliente</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Client List -->
+            <div class="section client-list-section">
+                <div class="section-header">
+                    <i data-lucide="users"></i>
+                    <h2>Clientes (<span id="clientCount">0</span>)</h2>
+                    <button class="btn-icon btn-danger-icon" id="clearAllBtn" title="Remover todos">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="client-list" id="clientList">
+                    <div class="empty-state" id="emptyState">
+                        <i data-lucide="map-pin-off"></i>
+                        <p>Nenhum cliente adicionado</p>
+                        <span>Cole links do Google Maps acima para começar</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="section section-actions">
+                <button class="btn btn-accent btn-lg" id="calculateRouteBtn" disabled>
+                    <i data-lucide="navigation"></i>
+                    <span>Calcular Melhor Rota</span>
+                </button>
+                <button class="btn btn-secondary btn-lg" id="openGoogleMapsBtn" style="display:none;">
+                    <i data-lucide="external-link"></i>
+                    <span>Abrir no Google Maps</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Toggle -->
+        <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <!-- Map Area -->
+        <main class="map-container">
+            <div id="map"></div>
+
+            <!-- Route Summary Overlay -->
+            <div class="route-summary" id="routeSummary" style="display:none;">
+                <div class="route-summary-header">
+                    <h3>
+                        <i data-lucide="flag"></i>
+                        Resumo da Rota
+                    </h3>
+                    <button class="btn-icon" id="closeRouteSummary">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="route-summary-body">
+                    <div class="route-stat">
+                        <div class="stat-icon stat-distance">
+                            <i data-lucide="ruler"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Distância Total</span>
+                            <span class="stat-value" id="totalDistance">0 km</span>
+                        </div>
+                    </div>
+                    <div class="route-stat">
+                        <div class="stat-icon stat-time">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Tempo Estimado</span>
+                            <span class="stat-value" id="totalTime">0 min</span>
+                        </div>
+                    </div>
+                    <div class="route-stat">
+                        <div class="stat-icon stat-stops">
+                            <i data-lucide="map-pin"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Paradas</span>
+                            <span class="stat-value" id="totalStops">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="route-order" id="routeOrder">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <p>Calculando a melhor rota...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- App JS -->
+    <script src="app.js"></script>
+</body>
+
+</html>
