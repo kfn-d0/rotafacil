@@ -16,9 +16,14 @@
 
 O **RotaFácil** é uma aplicação web criada para profissionais que trabalham em centrais de atendimento, suporte técnico em campo, logística e entregas. A ferramenta recebe links do Google Maps de múltiplos clientes e calcula automaticamente a **melhor rota com o menor deslocamento possível**, resolvendo o clássico **Problema do Caixeiro Viajante (TSP)**.
 
+<img width="1920" height="944" alt="1" src="https://github.com/user-attachments/assets/f839a9c5-6f42-4ecd-a11f-968c3a856b15" />
+<img width="1920" height="948" alt="2" src="https://github.com/user-attachments/assets/0ee0b542-f118-471d-8e92-0edee4674b63" />
+
+
 ### 🎯 Problema que resolve
 
-Quando você precisa visitar vários clientes no dia, definir manualmente a ordem das visitas pode resultar em rotas ineficientes e desperdício de tempo e combustível. O RotaFácil otimiza essa rota automaticamente, economizando tempo e recursos.
+Quando você precisa visitar vários clientes no dia, definir manualmente a ordem das visitas pode resultar em rotas ineficientes e desperdício de tempo e combustível. 
+O RotaFácil otimiza essa rota automaticamente, economizando tempo e recursos.
 
 ---
 
