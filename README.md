@@ -1,4 +1,4 @@
-# 🗺️ RotaFácil — Otimizador de Rotas para Atendimento em Campo
+# 🗺️ RotaFácil - Otimizador de Rotas para Atendimento em Campo
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Ativo-22c55e?style=for-the-badge" alt="Status">
