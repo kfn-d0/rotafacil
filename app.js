@@ -3,8 +3,8 @@
 
     const state = {
         base: {
-            lat: -2.5297,
-            lng: -44.2825,
+            lat: -2.4958075418161236,
+            lng: -44.307243068708296,
             name: 'Central (Base)'
         },
         clients: [],
@@ -41,7 +41,16 @@
         totalStops: document.getElementById('totalStops'),
         routeOrder: document.getElementById('routeOrder'),
         loadingOverlay: document.getElementById('loadingOverlay'),
-        toastContainer: document.getElementById('toastContainer')
+        toastContainer: document.getElementById('toastContainer'),
+        shareRouteBtn: document.getElementById('shareRouteBtn'),
+        shareModalOverlay: document.getElementById('shareModalOverlay'),
+        closeShareModal: document.getElementById('closeShareModal'),
+        shareLinkInput: document.getElementById('shareLinkInput'),
+        copyLinkBtn: document.getElementById('copyLinkBtn'),
+        shareMessageText: document.getElementById('shareMessageText'),
+        copyMessageBtn: document.getElementById('copyMessageBtn'),
+        shareWhatsAppBtn: document.getElementById('shareWhatsAppBtn'),
+        shareNativeBtn: document.getElementById('shareNativeBtn')
     };
 
     function initMap() {
@@ -410,13 +419,74 @@
             pathElement.style.animation = 'dash 1.5s linear infinite';
         }
 
+        addRouteArrows(latLngs);
+
         state.map.fitBounds(routeLine.getBounds(), { padding: [60, 60] });
+    }
+
+    function getBearing(start, end) {
+        const startLat = start[0] * Math.PI / 180;
+        const startLng = start[1] * Math.PI / 180;
+        const endLat = end[0] * Math.PI / 180;
+        const endLng = end[1] * Math.PI / 180;
+        const dLng = endLng - startLng;
+        const x = Math.sin(dLng) * Math.cos(endLat);
+        const y = Math.cos(startLat) * Math.sin(endLat) - Math.sin(startLat) * Math.cos(endLat) * Math.cos(dLng);
+        let bearing = Math.atan2(x, y) * 180 / Math.PI;
+        return (bearing + 360) % 360;
+    }
+
+    function getDistanceBetween(p1, p2) {
+        const R = 6371000;
+        const lat1 = p1[0] * Math.PI / 180;
+        const lat2 = p2[0] * Math.PI / 180;
+        const dLat = (p2[0] - p1[0]) * Math.PI / 180;
+        const dLng = (p2[1] - p1[1]) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function addRouteArrows(latLngs) {
+        if (latLngs.length < 2) return;
+
+        const arrowSpacing = 800;
+        let accumulated = 0;
+
+        for (let i = 1; i < latLngs.length; i++) {
+            const prev = latLngs[i - 1];
+            const curr = latLngs[i];
+            const dist = getDistanceBetween(prev, curr);
+            accumulated += dist;
+
+            if (accumulated >= arrowSpacing) {
+                accumulated = 0;
+                const bearing = getBearing(prev, curr);
+                const midLat = (prev[0] + curr[0]) / 2;
+                const midLng = (prev[1] + curr[1]) / 2;
+
+                const arrowIcon = L.divIcon({
+                    className: 'route-arrow',
+                    html: `<div class="arrow-indicator" style="transform: rotate(${bearing}deg)">▲</div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                const arrowMarker = L.marker([midLat, midLng], {
+                    icon: arrowIcon,
+                    interactive: false,
+                    keyboard: false
+                });
+
+                state.routeLayer.addLayer(arrowMarker);
+            }
+        }
     }
 
     function clearRoute() {
         if (state.routeLayer) state.routeLayer.clearLayers();
         dom.routeSummary.style.display = 'none';
         dom.openGoogleMapsBtn.style.display = 'none';
+        dom.shareRouteBtn.style.display = 'none';
     }
 
     function showRouteSummary(distance, duration, optimizedOrder) {
@@ -468,22 +538,109 @@
 
         dom.routeSummary.style.display = 'block';
         dom.openGoogleMapsBtn.style.display = 'flex';
+        dom.shareRouteBtn.style.display = 'flex';
 
         state.lastOptimizedOrder = optimizedOrder;
+        state.lastRouteDistance = distance;
+        state.lastRouteDuration = duration;
     }
 
     function openInGoogleMaps() {
         if (!state.lastOptimizedOrder || state.lastOptimizedOrder.length === 0) return;
+        return generateGoogleMapsUrl();
+    }
 
+    function generateGoogleMapsUrl() {
         const order = state.lastOptimizedOrder;
         const origin = `${state.base.lat},${state.base.lng}`;
         const destination = origin;
-
         const waypoints = order.map(c => `${c.lat},${c.lng}`).join('|');
+        return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
+    }
 
-        const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
+    function generateShareMessage() {
+        const order = state.lastOptimizedOrder;
+        if (!order || order.length === 0) return '';
 
-        window.open(url, '_blank');
+        const distKm = (state.lastRouteDistance / 1000).toFixed(1);
+        const hours = Math.floor(state.lastRouteDuration / 3600);
+        const minutes = Math.round((state.lastRouteDuration % 3600) / 60);
+        const timeStr = hours > 0 ? `${hours}h ${minutes}min` : `${minutes} min`;
+
+        let msg = `🗺️ *ROTA DE ATENDIMENTO*\n`;
+        msg += `━━━━━━━━━━━━━━━━━\n\n`;
+        msg += `📊 *Resumo:*\n`;
+        msg += `  📏 Distância: ${distKm} km\n`;
+        msg += `  ⏱️ Tempo estimado: ${timeStr}\n`;
+        msg += `  📍 Paradas: ${order.length}\n\n`;
+        msg += `🔗 *Abrir rota no Google Maps:*\n`;
+        msg += generateGoogleMapsUrl();
+
+        return msg;
+    }
+
+    function openShareModal() {
+        if (!state.lastOptimizedOrder || state.lastOptimizedOrder.length === 0) {
+            showToast('Calcule uma rota primeiro.', 'warning');
+            return;
+        }
+
+        const mapsUrl = generateGoogleMapsUrl();
+        const message = generateShareMessage();
+
+        dom.shareLinkInput.value = mapsUrl;
+        dom.shareMessageText.value = message;
+
+        dom.shareModalOverlay.style.display = 'flex';
+        lucide.createIcons();
+    }
+
+    function closeShareModal() {
+        dom.shareModalOverlay.style.display = 'none';
+    }
+
+    async function copyToClipboard(text, label) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast(`${label} copiado!`, 'success');
+        } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`${label} copiado!`, 'success');
+        }
+    }
+
+    function shareViaWhatsApp() {
+        const message = generateShareMessage();
+        const encoded = encodeURIComponent(message);
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+    }
+
+    async function shareNative() {
+        const message = generateShareMessage();
+        const mapsUrl = generateGoogleMapsUrl();
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Rota de Atendimento - RotaFácil',
+                    text: message,
+                    url: mapsUrl
+                });
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    await copyToClipboard(message, 'Mensagem');
+                }
+            }
+        } else {
+            await copyToClipboard(message, 'Mensagem');
+        }
     }
 
     function fitMapBounds() {
@@ -642,7 +799,38 @@
         });
 
         dom.openGoogleMapsBtn.addEventListener('click', () => {
-            openInGoogleMaps();
+            const url = openInGoogleMaps();
+            if (url) window.open(url, '_blank');
+        });
+
+        dom.shareRouteBtn.addEventListener('click', () => {
+            openShareModal();
+        });
+
+        dom.closeShareModal.addEventListener('click', () => {
+            closeShareModal();
+        });
+
+        dom.shareModalOverlay.addEventListener('click', (e) => {
+            if (e.target === dom.shareModalOverlay) {
+                closeShareModal();
+            }
+        });
+
+        dom.copyLinkBtn.addEventListener('click', () => {
+            copyToClipboard(dom.shareLinkInput.value, 'Link');
+        });
+
+        dom.copyMessageBtn.addEventListener('click', () => {
+            copyToClipboard(dom.shareMessageText.value, 'Mensagem');
+        });
+
+        dom.shareWhatsAppBtn.addEventListener('click', () => {
+            shareViaWhatsApp();
+        });
+
+        dom.shareNativeBtn.addEventListener('click', () => {
+            shareNative();
         });
 
         dom.closeRouteSummary.addEventListener('click', () => {
