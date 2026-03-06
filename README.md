@@ -1,4 +1,4 @@
-# 🗺️ RotaFácil - Otimizador de Rotas para Atendimento em Campo
+# RotaFácil - Otimizador de Rotas para Atendimento em Campo
 
 <p align="center">
   <img src="https://img.shields.io/badge/Licença-MIT-3b82f6?style=for-the-badge" alt="Licença">
