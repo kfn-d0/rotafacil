@@ -11,7 +11,7 @@
 
 ---
 
-## 📖 Sobre o Projeto
+## Sobre o Projeto
 
 O **RotaFácil** é uma aplicação web criada para profissionais que trabalham em centrais de atendimento, suporte técnico em campo, logística e entregas. A ferramenta recebe links do Google Maps de múltiplos clientes e calcula automaticamente a **melhor rota com o menor deslocamento possível**, resolvendo o clássico **Problema do Caixeiro Viajante (TSP)**.
 
@@ -19,7 +19,7 @@ O **RotaFácil** é uma aplicação web criada para profissionais que trabalham 
 <img width="1920" height="948" alt="2" src="https://github.com/user-attachments/assets/0ee0b542-f118-471d-8e92-0edee4674b63" />
 
 
-### 🎯 Problema que resolve
+### Problema que resolve
 
 Quando você precisa visitar vários clientes no dia, definir manualmente a ordem das visitas pode resultar em rotas ineficientes e desperdício de tempo e combustível. 
 
@@ -27,24 +27,24 @@ O RotaFácil otimiza essa rota automaticamente, economizando tempo e recursos.
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 | Recurso | Descrição |
 |---------|-----------|
-| 🔗 **Links do Google Maps** | Cole links do Google Maps e as coordenadas são extraídas automaticamente |
-| 📝 **Coordenadas manuais** | Opção para inserir latitude e longitude diretamente |
-| 🧮 **Rota otimizada (TSP)** | Algoritmo que encontra a rota com menor deslocamento entre todos os pontos |
-| 🗺️ **Mapa interativo** | Visualização em mapa escuro com marcadores customizados e rota animada |
-| 📊 **Resumo da rota** | Exibe distância total, tempo estimado e ordem de visita |
-| 🧭 **Exportar para Google Maps** | Abre a rota otimizada diretamente no Google Maps para navegação GPS |
-| 📌 **Base configurável** | Defina qualquer ponto como sua localização central |
-| 💾 **Persistência local** | Clientes são salvos automaticamente no navegador |
-| 📱 **Design responsivo** | Funciona perfeitamente em desktop e dispositivos móveis |
-| 🌙 **Dark Mode** | Interface moderna com tema escuro e efeitos glassmorphism |
+| **Links do Google Maps** | Cole links do Google Maps e as coordenadas são extraídas automaticamente |
+| **Coordenadas manuais** | Opção para inserir latitude e longitude diretamente |
+| **Rota otimizada (TSP)** | Algoritmo que encontra a rota com menor deslocamento entre todos os pontos |
+| **Mapa interativo** | Visualização em mapa escuro com marcadores customizados e rota animada |
+| **Resumo da rota** | Exibe distância total, tempo estimado e ordem de visita |
+| **Exportar para Google Maps** | Abre a rota otimizada diretamente no Google Maps para navegação GPS |
+| **Base configurável** | Defina qualquer ponto como sua localização central |
+| **Persistência local** | Clientes são salvos automaticamente no navegador |
+| **Design responsivo** | Funciona perfeitamente em desktop e dispositivos móveis |
+| **Dark Mode** | Interface moderna com tema escuro e efeitos glassmorphism |
 
 ---
 
-## 🚀 Como Usar
+## Como Usar
 
 ### 1. Abrir a aplicação
 
@@ -79,7 +79,7 @@ Após adicionar todos os clientes, clique no botão verde **"Calcular Melhor Rot
 3. Desenhar a rota no mapa
 4. Exibir o resumo com distância e tempo
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 | Tecnologia | Uso |
 |-----------|-----|
@@ -94,7 +94,7 @@ Após adicionar todos os clientes, clique no botão verde **"Calcular Melhor Rot
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 PROJECT/
@@ -106,7 +106,7 @@ PROJECT/
 
 ---
 
-## 🔧 Como Funciona (Técnico)
+## Como Funciona (Técnico)
 
 1. **Parsing de Links**: Expressões regulares extraem coordenadas de diversos formatos de URLs do Google Maps.
 
